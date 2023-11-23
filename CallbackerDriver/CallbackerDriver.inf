@@ -1,0 +1,77 @@
+;
+; CallbackerDriver.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=CallbackerDriver.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+CallbackerDriver_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+CallbackerDriver.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%CallbackerDriver.DeviceDesc%=CallbackerDriver_Device, Root\CallbackerDriver ; TODO: edit hw-id
+
+[CallbackerDriver_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+CallbackerDriver.sys
+
+;-------------- Service installation
+[CallbackerDriver_Device.NT.Services]
+AddService = CallbackerDriver,%SPSVCINST_ASSOCSERVICE%, CallbackerDriver_Service_Inst
+
+; -------------- CallbackerDriver driver install sections
+[CallbackerDriver_Service_Inst]
+DisplayName    = %CallbackerDriver.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\CallbackerDriver.sys
+
+;
+;--- CallbackerDriver_Device Coinstaller installation ------
+;
+
+[CallbackerDriver_Device.NT.CoInstallers]
+AddReg=CallbackerDriver_Device_CoInstaller_AddReg
+CopyFiles=CallbackerDriver_Device_CoInstaller_CopyFiles
+
+[CallbackerDriver_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[CallbackerDriver_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[CallbackerDriver_Device.NT.Wdf]
+KmdfService =  CallbackerDriver, CallbackerDriver_wdfsect
+[CallbackerDriver_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "CallbackerDriver Installation Disk"
+CallbackerDriver.DeviceDesc = "CallbackerDriver Device"
+CallbackerDriver.SVCDESC = "CallbackerDriver Service"
