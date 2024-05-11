@@ -84,7 +84,7 @@ OnProcessNotify(
 		DbgPrint("[+] Process: %ws started\n", createInfo->CommandLine->Buffer);
 		if (wcsstr(createInfo->CommandLine->Buffer, L"Cheat Engine") != NULL)
 		{
-			DbgPrint("[!] Access to launch notepad.exe was denied!");
+			DbgPrint("[!] Access to launch Cheat Engine was denied!");
 			createInfo->CreationStatus = STATUS_ACCESS_DENIED;
 		}
 	}
